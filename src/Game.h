@@ -15,6 +15,8 @@ public:
     float enemySpawnInterval;
     float asteroidSpawnTimer;
     float asteroidSpawnInterval;
+    float patternSpawnTimer;
+    float patternSpawnInterval;
 
     Game();
     void Update();

@@ -3,7 +3,7 @@
 #include <cmath>
 
 Game::Game() 
-    : enemySpawnTimer(0), enemySpawnInterval(3.0f), asteroidSpawnTimer(0), asteroidSpawnInterval(5.0f) {
+    : enemySpawnTimer(0), enemySpawnInterval(3.0f), patternSpawnTimer(0), patternSpawnInterval(1.0f) {
 }
 
 void Game::Update() {
@@ -15,13 +15,27 @@ void Game::Update() {
     // Удалить неактивные пули
     bullets.erase(std::remove_if(bullets.begin(), bullets.end(),
         [](const Bullet& b) { return !b.active; }), bullets.end());
-
+    patternSpawnTimer -= GetFrameTime();
+    if (patternSpawnTimer <= 0) {
+        patternSpawnTimer = patternSpawnInterval;
+        float x = GetRandomValue(50, GetScreenWidth()-50);
+        Vector2 pos = {x, -20};
+        int pattern = GetRandomValue(0, 2); // 0-цветок, 1-линия, 2-случайный
+        switch (pattern) {
+            case 0: Enemy::SpawnFlower(pos, bullets); break;
+            case 1: Enemy::SpawnLine(pos, bullets); break;
+            case 2: Enemy::SpawnRandom(pos, bullets); break;
+        }
+    }
     // Спавн врагов
     enemySpawnTimer -= GetFrameTime();
     if (enemySpawnTimer <= 0) {
         enemySpawnTimer = enemySpawnInterval;
         float x = GetRandomValue(50, GetScreenWidth()-50);
-        enemies.emplace_back(Vector2{x, -30});
+        // Выбираем тип врага случайно
+        int rnd = GetRandomValue(0, 99);
+        EnemyType type = (rnd < 70) ? VORTEX_ENEMY : ASTEROID_ENEMY;
+        enemies.emplace_back(Vector2{x, -30}, type);   // <-- теперь передаём тип
     }
 
     // Обновить врагов
@@ -33,24 +47,7 @@ void Game::Update() {
     // Удалить неактивных врагов
     enemies.erase(std::remove_if(enemies.begin(), enemies.end(),
         [](const Enemy& e) { return !e.active; }), enemies.end());
-    // Спавн астероидов
-    asteroidSpawnTimer -= GetFrameTime();
-    if (asteroidSpawnTimer <= 0) {
-        asteroidSpawnTimer = asteroidSpawnInterval;
-        // Спавним один астероид сбоку или сверху
-        float x = GetRandomValue(0, GetScreenWidth());
-        float y = -30; // сверху, но можно сбоку
-        // Создаём пулю-астероид
-        Vector2 dir = {0, 1}; // летит вниз
-        // Можно направить на игрока:
-        Vector2 toPlayer = {player.pos.x - x, player.pos.y - y};
-        float len = sqrtf(toPlayer.x*toPlayer.x + toPlayer.y*toPlayer.y);
-        if (len > 0) { dir = {toPlayer.x/len, toPlayer.y/len}; }
-        float speed = 1.5f; // медленнее обычных
-        Vector2 vel = {dir.x * speed, dir.y * speed};
-        Bullet asteroid({x, y}, vel, 20, true, ASTEROID);
-        bullets.push_back(asteroid);
-    }
+
 }
 
 void Game::Draw() {
@@ -72,7 +69,10 @@ void Game::CheckCollisions() {
             float dy = b.pos.y - e.pos.y;
             if (dx*dx + dy*dy < (b.radius + e.radius)*(b.radius + e.radius)) {
                 b.active = false;
-                e.active = false;
+                e.TakeDamage(b.damage);
+                if (!e.active) {
+                    e.OnDeath(bullets);
+                }
             }
         }
     }

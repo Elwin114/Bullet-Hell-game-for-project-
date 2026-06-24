@@ -1,12 +1,28 @@
 #include "Enemy.h"
 #include <cmath>
+#include <cstdlib>
 
-Enemy::Enemy(Vector2 position) : pos(position), radius(20), shootTimer(0), shootInterval(1.5f), active(true) {
-    // выбрать случайный паттерн при создании
-    currentPattern = static_cast<Pattern>(GetRandomValue(0, 3));
+Enemy::Enemy(Vector2 position, EnemyType t) : pos(position), radius(20), shootTimer(0), shootInterval(1.5f), active(true),
+type (t) {
+    switch (type) {
+        case VORTEX_ENEMY:
+            radius = 25;
+            health = 4;
+            velocity = {0, 0.3f};
+            shootInterval = 2.0f;
+            break;
+        case ASTEROID_ENEMY:
+            radius = 40;
+            health = 6;
+            velocity = {0, 0.2f};
+            shootInterval = 0;   // не стреляет
+            break;
+    }
+    if (type == VORTEX_ENEMY)
+        currentPattern = static_cast<Pattern>(GetRandomValue(0, 3));
 }
 
-void Enemy::SpawnFlower(std::vector<Bullet>& bullets) {
+void Enemy::SpawnFlower(Vector2 pos,std::vector<Bullet>& bullets) {
     int count = 12; // количество пуль
     float baseSpeed = 3.0f;
     for (int i = 0; i < count; ++i) {
@@ -16,7 +32,7 @@ void Enemy::SpawnFlower(std::vector<Bullet>& bullets) {
     }
 }
 
-void Enemy::SpawnLine(std::vector<Bullet>& bullets) {
+void Enemy::SpawnLine(Vector2 pos,std::vector<Bullet>& bullets) {
     int count = 5;
     float angle = atan2(GetScreenHeight()/2 - pos.y, GetScreenWidth()/2 - pos.x); // летят к центру
     for (int i = 0; i < count; ++i) {
@@ -30,7 +46,7 @@ void Enemy::SpawnLine(std::vector<Bullet>& bullets) {
     }
 }
 
-void Enemy::SpawnRandom(std::vector<Bullet>& bullets) {
+void Enemy::SpawnRandom(Vector2 pos,std::vector<Bullet>& bullets) {
     int count = 10;
     for (int i = 0; i < count; ++i) {
         float angle = GetRandomValue(0, 360) * DEG2RAD;
@@ -54,20 +70,55 @@ void Enemy::SpawnVortex(std::vector<Bullet>& bullets) {
 
 void Enemy::Update(std::vector<Bullet>& bullets) {
     if (!active) return;
+    //Движение
+    pos.x += velocity.x * GetFrameTime() * 60;
+    pos.y += velocity.y * GetFrameTime() * 60;
+    if (pos.y > GetScreenHeight() + 50) {
+        active = false;
+        return;
+    }    
+    if (type == VORTEX_ENEMY) {
+        shootTimer -= GetFrameTime();
+        if (shootTimer <= 0) {
+            shootTimer = shootInterval;
+            switch (currentPattern) {
+                case PATTERN_FLOWER: SpawnFlower(pos, bullets); break;
+                case PATTERN_LINE:   SpawnLine(pos, bullets);   break;
+                case PATTERN_RANDOM: SpawnRandom(pos, bullets); break;
+                case PATTERN_VORTEX: SpawnVortex(bullets);      break;
+            }
+        }
+    }
+}
 
-    shootTimer -= GetFrameTime();
-    if (shootTimer <= 0) {
-        shootTimer = shootInterval;
-        switch (currentPattern) {
-            case PATTERN_FLOWER: SpawnFlower(bullets); break;
-            case PATTERN_LINE: SpawnLine(bullets); break;
-            case PATTERN_RANDOM: SpawnRandom(bullets); break;
-            case PATTERN_VORTEX: SpawnVortex(bullets); break;
+void Enemy::TakeDamage(int damage) {
+    health -= damage;
+    if (health <= 0) {
+        active = false;
+    }
+}
+
+void Enemy::OnDeath(std::vector<Bullet>& bullets) {
+    if (type == ASTEROID_ENEMY) {
+        // 8 пуль во все стороны
+        for (int i = 0; i < 8; ++i) {
+            float angle = (2 * PI / 8) * i;
+            Vector2 vel = {cosf(angle) * 3.0f, sinf(angle) * 3.0f};
+            bullets.emplace_back(pos, vel, 5, true, NORMAL);
+        }
+    } else if (type == VORTEX_ENEMY) {
+        // 4 пули с небольшим разбросом
+        for (int i = 0; i < 4; ++i) {
+            float angle = (2 * PI / 4) * i + GetRandomValue(0, 30) * DEG2RAD;
+            Vector2 vel = {cosf(angle) * 2.0f, sinf(angle) * 2.0f};
+            bullets.emplace_back(pos, vel, 4, true, NORMAL);
         }
     }
 }
 
 void Enemy::Draw() const {
     if (!active) return;
-    DrawCircleV(pos, radius, PURPLE);
+    Color color = (type == VORTEX_ENEMY) ? ORANGE : BROWN;
+    DrawCircleV(pos, radius, color);
+    DrawCircleLines(pos.x, pos.y, radius, WHITE);
 }
