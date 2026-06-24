@@ -13,6 +13,8 @@ public:
     std::vector<Enemy> enemies;
     float enemySpawnTimer;
     float enemySpawnInterval;
+    float asteroidSpawnTimer;
+    float asteroidSpawnInterval;
 
     Game();
     void Update();

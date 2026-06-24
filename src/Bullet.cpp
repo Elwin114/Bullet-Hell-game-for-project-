@@ -1,9 +1,12 @@
 #include "Bullet.h"
 
-Bullet::Bullet() : pos{0,0}, vel{0,0}, radius(5), active(false), isEnemy(false) {}
+Bullet::Bullet() : pos{0,0}, vel{0,0}, radius(5), active(false), isEnemy(false), type(NORMAL), damage(1) {}
 
-Bullet::Bullet(Vector2 position, Vector2 velocity, float r, bool enemy)
-    : pos(position), vel(velocity), radius(r), active(true), isEnemy(enemy) {}
+Bullet::Bullet(Vector2 position, Vector2 velocity, float r, bool enemy, BulletType t)
+    : pos(position), vel(velocity), radius(r), active(true), isEnemy(enemy), type(t) {
+        if (type == NORMAL) damage = 1;
+        else if (type == ASTEROID) damage = 3;
+    }
 
 void Bullet::Update() {
     if (!active) return;
@@ -18,6 +21,14 @@ void Bullet::Update() {
 
 void Bullet::Draw() const {
     if (!active) return;
-    Color color = isEnemy ? RED : YELLOW;
-    DrawCircleV(pos, radius, color);
+    if (type == NORMAL) {
+        Color color = isEnemy ? RED : YELLOW;
+        DrawCircleV(pos,radius,color);
+    }
+    else if(type == ASTEROID)
+    {
+        DrawCircleV(pos, radius, BROWN);
+        DrawCircleLines(pos.x, pos.y, radius, DARKBROWN);
+    }
+
 }

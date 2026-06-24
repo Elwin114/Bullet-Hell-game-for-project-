@@ -2,9 +2,8 @@
 #include <algorithm>
 #include <cmath>
 
-Game::Game() {
-    enemySpawnTimer = 0;
-    enemySpawnInterval = 3.0f;
+Game::Game() 
+    : enemySpawnTimer(0), enemySpawnInterval(3.0f), asteroidSpawnTimer(0), asteroidSpawnInterval(5.0f) {
 }
 
 void Game::Update() {
@@ -13,7 +12,7 @@ void Game::Update() {
     // Обновить все пули
     for (auto& b : bullets) b.Update();
 
-    // Удалить неактивные пули (эффективный способ)
+    // Удалить неактивные пули
     bullets.erase(std::remove_if(bullets.begin(), bullets.end(),
         [](const Bullet& b) { return !b.active; }), bullets.end());
 
@@ -34,6 +33,24 @@ void Game::Update() {
     // Удалить неактивных врагов
     enemies.erase(std::remove_if(enemies.begin(), enemies.end(),
         [](const Enemy& e) { return !e.active; }), enemies.end());
+    // Спавн астероидов
+    asteroidSpawnTimer -= GetFrameTime();
+    if (asteroidSpawnTimer <= 0) {
+        asteroidSpawnTimer = asteroidSpawnInterval;
+        // Спавним один астероид сбоку или сверху
+        float x = GetRandomValue(0, GetScreenWidth());
+        float y = -30; // сверху, но можно сбоку
+        // Создаём пулю-астероид
+        Vector2 dir = {0, 1}; // летит вниз
+        // Можно направить на игрока:
+        Vector2 toPlayer = {player.pos.x - x, player.pos.y - y};
+        float len = sqrtf(toPlayer.x*toPlayer.x + toPlayer.y*toPlayer.y);
+        if (len > 0) { dir = {toPlayer.x/len, toPlayer.y/len}; }
+        float speed = 1.5f; // медленнее обычных
+        Vector2 vel = {dir.x * speed, dir.y * speed};
+        Bullet asteroid({x, y}, vel, 20, true, ASTEROID);
+        bullets.push_back(asteroid);
+    }
 }
 
 void Game::Draw() {
@@ -67,11 +84,11 @@ void Game::CheckCollisions() {
         float dy = b.pos.y - player.pos.y;
         if (dx*dx + dy*dy < (b.radius + player.radius)*(b.radius + player.radius)) {
             b.active = false;
-            player.health--;
+            player.health -= b.damage;
         }
     }
 
-    // Враги vs игрок (столкновение)
+    // Враги vs игрок
     for (auto& e : enemies) {
         if (!e.active) continue;
         float dx = e.pos.x - player.pos.x;
