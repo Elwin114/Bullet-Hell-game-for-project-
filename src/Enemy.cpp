@@ -1,6 +1,7 @@
 #include "Enemy.h"
 #include <cmath>
 
+
 Enemy::Enemy(Vector2 position) {
     pos = position;
     radius = 20;

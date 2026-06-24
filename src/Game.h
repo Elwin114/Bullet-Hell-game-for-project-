@@ -13,8 +13,9 @@ public:
     std::vector<Enemy> enemies;
     float enemySpawnTimer;
     float enemySpawnInterval;
+    Texture2D playerTex;
 
-    Game();
+    Game(Texture2D pTex);
     void Update();
     void Draw();
     void CheckCollisions();

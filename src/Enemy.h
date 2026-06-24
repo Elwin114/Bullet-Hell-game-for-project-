@@ -3,6 +3,7 @@
 #include <vector>
 #include "Bullet.h"   // <-- добавить
 
+
 class Enemy {
 public:
     Vector2 pos;
