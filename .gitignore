@@ -1,0 +1,56 @@
+# Build artifacts
+*.exe
+*.out
+*.app
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dylib
+*.dll
+*.pdb
+*.ilk
+*.exp
+*.manifest
+
+# Build directories
+build/
+out/
+cmake-build-*/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+CMakeUserPresets.json
+*.cmake
+!CMakeLists.txt
+
+# IDE and editor files
+.vscode/
+*.code-workspace
+.vs/
+*.sdf
+*.opensdf
+*.suo
+.idea/
+*.iml
+*.creator*
+*.files
+*.includes
+*.config
+
+# Temporary and system files
+*.tmp
+*.log
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# User-specific files
+*.user
+*.ntvs*
+*.njsproj
+*.sln.docstates
