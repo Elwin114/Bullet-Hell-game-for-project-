@@ -1,9 +1,12 @@
 #pragma once
 #include "raylib.h"
+#include <vector>
+#include <cstddef>
 
 enum BulletType {
     NORMAL,   // красные обычные
-    ASTEROID  // астероид
+    ASTEROID,  // астероид
+    VORTEX
 };
 
 class Bullet {
@@ -16,8 +19,17 @@ public:
     int damage;
     bool isEnemy;       // true – вражеская, false – игрока
 
+
+    std::vector<Bullet> satellites; // спутники, вращающиеся вокруг центра
+    float orbitRadius;
+    float orbitSpeed;
+    float angle;
+
     Bullet();
     Bullet(Vector2 position, Vector2 velocity, float radius, bool enemy, BulletType type = NORMAL);
+
+    Bullet(Vector2 position, Vector2 velocity, float radius, bool enemy, int satelliteCount, 
+        float orbitRadius, float orbitSpeed); // Вихри
 
     void Update();
     void Draw() const;

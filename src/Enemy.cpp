@@ -3,7 +3,7 @@
 
 Enemy::Enemy(Vector2 position) : pos(position), radius(20), shootTimer(0), shootInterval(1.5f), active(true) {
     // выбрать случайный паттерн при создании
-    currentPattern = static_cast<Pattern>(GetRandomValue(0, 2));
+    currentPattern = static_cast<Pattern>(GetRandomValue(0, 3));
 }
 
 void Enemy::SpawnFlower(std::vector<Bullet>& bullets) {
@@ -39,7 +39,18 @@ void Enemy::SpawnRandom(std::vector<Bullet>& bullets) {
         bullets.emplace_back(pos, vel, 5, true, BulletType::NORMAL);
     }
 }
-
+void Enemy::SpawnVortex(std::vector<Bullet>& bullets) {
+    // Создаём вихрь: центр движется в случайном направлении
+    float angle = GetRandomValue(0, 360) * DEG2RAD;
+    float speed = 2.0f;
+    Vector2 vel = {cosf(angle) * speed, sinf(angle) * speed};
+    // Количество спутников, радиус орбиты, скорость вращения
+    int satelliteCount = 6;
+    float orbitRadius = 30.0f;
+    float orbitSpeed = 3.0f; // радиан в секунду
+    Bullet vortex(pos, vel, 10, true, satelliteCount, orbitRadius, orbitSpeed);
+    bullets.push_back(vortex);
+}
 
 void Enemy::Update(std::vector<Bullet>& bullets) {
     if (!active) return;
@@ -47,11 +58,11 @@ void Enemy::Update(std::vector<Bullet>& bullets) {
     shootTimer -= GetFrameTime();
     if (shootTimer <= 0) {
         shootTimer = shootInterval;
-        // Веер из 8 пуль
         switch (currentPattern) {
-            case FLOWER: SpawnFlower(bullets); break;
-            case LINE: SpawnLine(bullets); break;
-            case RANDOM: SpawnRandom(bullets); break;
+            case PATTERN_FLOWER: SpawnFlower(bullets); break;
+            case PATTERN_LINE: SpawnLine(bullets); break;
+            case PATTERN_RANDOM: SpawnRandom(bullets); break;
+            case PATTERN_VORTEX: SpawnVortex(bullets); break;
         }
     }
 }

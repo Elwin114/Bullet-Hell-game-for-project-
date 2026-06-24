@@ -17,7 +17,6 @@ int main() {
     Game game;
 
     while (!WindowShouldClose()) {
-        // --- UPDATE ---
         if (state == MENU) {
             if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_DOWN)) {
                 selectedItem = (selectedItem + 1) % 2;
