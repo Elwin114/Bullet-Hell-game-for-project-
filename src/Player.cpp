@@ -8,6 +8,11 @@ Player::Player() {
     health = 5;
     shootCooldown = 0;
     shootDelay = 0.15f;
+    texture = {0};
+}
+
+void Player::SetTexture(Texture2D tex) {
+    texture = tex;
 }
 
 void Player::Update(std::vector<Bullet>& bullets) {
@@ -43,6 +48,16 @@ void Player::Update(std::vector<Bullet>& bullets) {
 }
 
 void Player::Draw() const {
-    DrawCircleV(pos, radius, BLUE);
-    DrawCircleLines(pos.x, pos.y, radius, LIGHTGRAY);
+    if (texture.id > 0) {
+        // Рисуем текстуру по центру позиции
+        Vector2 origin = {texture.width/2.0f, texture.height/2.0f};
+
+        Vector2 drawPos = {pos.x - origin.x, pos.y - origin.y};
+
+        DrawTextureV(texture, drawPos, WHITE);
+    } else {
+        // Запасной вариант – круг (если текстура не загружена)
+        DrawCircleV(pos, radius, BLUE);
+        DrawCircleLines(pos.x, pos.y, radius, LIGHTGRAY);
+    }
 }

@@ -2,9 +2,8 @@
 #include <algorithm>
 #include <cmath>
 
-Game::Game() {
-    enemySpawnTimer = 0;
-    enemySpawnInterval = 3.0f;
+Game::Game(Texture2D pTex): enemySpawnTimer(0), enemySpawnInterval(3.0f), playerTex(pTex) {
+    player.SetTexture(playerTex);
 }
 
 void Game::Update() {

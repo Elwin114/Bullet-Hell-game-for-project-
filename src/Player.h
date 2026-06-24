@@ -11,8 +11,10 @@ public:
     int health;
     float shootCooldown;
     float shootDelay;
+    Texture2D texture;
 
     Player();
+    void SetTexture(Texture2D tex);
     void Update(std::vector<Bullet>& bullets);
     void Draw() const;
 };
