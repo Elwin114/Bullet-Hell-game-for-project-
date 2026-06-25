@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <cmath>
 
-Game::Game(Texture2D pTex): enemySpawnTimer(0), enemySpawnInterval(3.0f),, patternSpawnTimer(0), patternSpawnInterval(1.0f), playerTex(pTex) {
+Game::Game(Texture2D pTex): enemySpawnTimer(0), enemySpawnInterval(3.0f), patternSpawnTimer(0), patternSpawnInterval(1.0f), playerTex(pTex) {
     player.SetTexture(playerTex);
 }
 
