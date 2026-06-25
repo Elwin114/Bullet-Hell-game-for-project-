@@ -29,8 +29,10 @@ public:
     EnemyType type;
     int health;
     int maxHealth;
+    Texture2D texture;
 
     Enemy(Vector2 position, EnemyType type = NORMAL_ENEMY);
+    void SetTexture(Texture2D tex);
     void Update(std::vector<Bullet>& bullets);
     void Draw() const;
     void TakeDamage(int damage);
