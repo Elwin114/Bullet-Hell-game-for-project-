@@ -13,10 +13,12 @@ int main() {
     SetTargetFPS(60);
 
     Texture2D playerTex = LoadTexture("assets/player.png");
+    Texture2D asteroidTex = LoadTexture("assets/asteroid.png");
+    Texture2D vortexTex = LoadTexture("assets/vortex.png");
 
     GameState state = MENU;
     int selectedItem = 0;
-    Game game(playerTex);
+    Game game(playerTex, asteroidTex, vortexTex);
 
     while (!WindowShouldClose()) {
         if (state == MENU) {
@@ -25,7 +27,7 @@ int main() {
             }
             if (IsKeyPressed(KEY_ENTER)) {
                 if (selectedItem == 0) {
-                    game = Game(playerTex);
+                    game = Game(playerTex, asteroidTex, vortexTex);
                     state = PLAY;
                 } else {
                     CloseWindow();
@@ -63,6 +65,8 @@ int main() {
     }
 
     UnloadTexture(playerTex);
+    UnloadTexture(asteroidTex);
+    UnloadTexture(vortexTex);
     CloseWindow();
     return 0;
 }

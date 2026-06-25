@@ -3,7 +3,7 @@
 #include <cstdlib>
 
 Enemy::Enemy(Vector2 position, EnemyType t) : pos(position), radius(20), shootTimer(0), shootInterval(1.5f), active(true),
-type (t) {
+type (t), texture({0}) {
     switch (type) {
         case VORTEX_ENEMY:
             radius = 25;
@@ -21,7 +21,9 @@ type (t) {
     if (type == VORTEX_ENEMY)
         currentPattern = static_cast<Pattern>(GetRandomValue(0, 3));
 }
-
+void Enemy::SetTexture(Texture2D tex) {
+    texture = tex;
+}
 void Enemy::SpawnFlower(Vector2 pos,std::vector<Bullet>& bullets) {
     int count = 12; // количество пуль
     float baseSpeed = 3.0f;
@@ -118,7 +120,14 @@ void Enemy::OnDeath(std::vector<Bullet>& bullets) {
 
 void Enemy::Draw() const {
     if (!active) return;
-    Color color = (type == VORTEX_ENEMY) ? ORANGE : BROWN;
-    DrawCircleV(pos, radius, color);
-    DrawCircleLines(pos.x, pos.y, radius, WHITE);
+    if (texture.id > 0) {
+        Vector2 origin = {texture.width/2.0f, texture.height/2.0f};
+        Vector2 drawPos = {pos.x - origin.x, pos.y - origin.y};
+        DrawTextureV(texture, drawPos, WHITE);
+    } else {
+        // Fallback – круги (на случай, если текстура не загружена)
+        Color color = (type == VORTEX_ENEMY) ? ORANGE : BROWN;
+        DrawCircleV(pos, radius, color);
+        DrawCircleLines(pos.x, pos.y, radius, WHITE);
+    }
 }

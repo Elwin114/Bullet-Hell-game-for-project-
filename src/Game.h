@@ -18,8 +18,10 @@ public:
     float patternSpawnTimer;
     float patternSpawnInterval;
     Texture2D playerTex;
+    Texture2D asteroidTex;
+    Texture2D vortexTex;
 
-    Game(Texture2D pTex);
+    Game(Texture2D pTex,Texture2D aTex, Texture2D vTex);
     void Update();
     void Draw();
     void CheckCollisions();
