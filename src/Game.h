@@ -17,8 +17,9 @@ public:
     float asteroidSpawnInterval;
     float patternSpawnTimer;
     float patternSpawnInterval;
+    Texture2D playerTex;
 
-    Game();
+    Game(Texture2D pTex);
     void Update();
     void Draw();
     void CheckCollisions();

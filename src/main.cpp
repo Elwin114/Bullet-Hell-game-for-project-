@@ -12,9 +12,11 @@ int main() {
     InitWindow(screenWidth, screenHeight, "Bullet Hell");
     SetTargetFPS(60);
 
+    Texture2D playerTex = LoadTexture("assets/player.png");
+
     GameState state = MENU;
     int selectedItem = 0;
-    Game game;
+    Game game(playerTex);
 
     while (!WindowShouldClose()) {
         if (state == MENU) {
@@ -23,7 +25,7 @@ int main() {
             }
             if (IsKeyPressed(KEY_ENTER)) {
                 if (selectedItem == 0) {
-                    game = Game();
+                    game = Game(playerTex);
                     state = PLAY;
                 } else {
                     CloseWindow();
@@ -60,6 +62,7 @@ int main() {
         EndDrawing();
     }
 
+    UnloadTexture(playerTex);
     CloseWindow();
     return 0;
 }
