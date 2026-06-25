@@ -15,6 +15,9 @@ int main() {
     Texture2D playerTex = LoadTexture("assets/player.png");
     Texture2D asteroidTex = LoadTexture("assets/asteroid.png");
     Texture2D vortexTex = LoadTexture("assets/vortex.png");
+    Texture2D menuBg = LoadTexture("assets/menu_bg.png");
+    Texture2D gameBg = LoadTexture("assets/game_bg.png");
+
 
     GameState state = MENU;
     int selectedItem = 0;
@@ -46,6 +49,19 @@ int main() {
         ClearBackground(BLACK);
 
         if (state == MENU) {
+            // Растягиваем фон на весь экран
+            DrawTexturePro(menuBg,
+                (Rectangle){0, 0, (float)menuBg.width, (float)menuBg.height},
+                (Rectangle){0, 0, (float)screenWidth, (float)screenHeight},
+                (Vector2){0, 0}, 0, WHITE);
+        } else if (state == PLAY) {
+            DrawTexturePro(gameBg,
+                (Rectangle){0, 0, (float)gameBg.width, (float)gameBg.height},
+                (Rectangle){0, 0, (float)screenWidth, (float)screenHeight},
+                (Vector2){0, 0}, 0, WHITE);
+        }
+
+        if (state == MENU) {
             DrawText("BULLET HELL", screenWidth/2 - MeasureText("BULLET HELL", 60)/2, 100, 60, WHITE);
 
             const char* items[] = { "Start Game", "Exit" };
@@ -67,6 +83,8 @@ int main() {
     UnloadTexture(playerTex);
     UnloadTexture(asteroidTex);
     UnloadTexture(vortexTex);
+    UnloadTexture(menuBg);
+    UnloadTexture(gameBg);
     CloseWindow();
     return 0;
 }
