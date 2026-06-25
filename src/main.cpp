@@ -1,4 +1,6 @@
 #include "Game.h"
+#include "raylib.h"
+
 
 enum GameState {
     MENU,
@@ -12,6 +14,13 @@ int main() {
     InitWindow(screenWidth, screenHeight, "Bullet Hell");
     SetTargetFPS(60);
 
+    InitAudioDevice();
+    Music menuMusic = LoadMusicStream("assets/music/menu_music.mp3");
+    Music gameMusic = LoadMusicStream("assets/music/game_music.mp3");
+
+    Music currentMusic = menuMusic;
+    PlayMusicStream(menuMusic);
+
     Texture2D playerTex = LoadTexture("assets/player.png");
     Texture2D asteroidTex = LoadTexture("assets/asteroid.png");
     Texture2D vortexTex = LoadTexture("assets/vortex.png");
@@ -24,12 +33,17 @@ int main() {
     Game game(playerTex, asteroidTex, vortexTex);
 
     while (!WindowShouldClose()) {
+        UpdateMusicStream(currentMusic);
         if (state == MENU) {
             if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_DOWN)) {
                 selectedItem = (selectedItem + 1) % 2;
             }
             if (IsKeyPressed(KEY_ENTER)) {
                 if (selectedItem == 0) {
+                    StopMusicStream(currentMusic);
+                    currentMusic = gameMusic;
+                    PlayMusicStream(gameMusic);
+
                     game = Game(playerTex, asteroidTex, vortexTex);
                     state = PLAY;
                 } else {
@@ -39,6 +53,10 @@ int main() {
         } else if (state == PLAY) {
             game.Update();
             if (game.player.health <= 0) {
+                StopMusicStream(currentMusic);
+                currentMusic = menuMusic;
+                PlayMusicStream(menuMusic);
+
                 state = MENU;
                 selectedItem = 0;
             }
@@ -79,6 +97,10 @@ int main() {
 
         EndDrawing();
     }
+    UnloadMusicStream(menuMusic);
+    UnloadMusicStream(gameMusic);
+    CloseAudioDevice();
+
 
     UnloadTexture(playerTex);
     UnloadTexture(asteroidTex);
