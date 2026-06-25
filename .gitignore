@@ -9,7 +9,6 @@
 *.so
 *.dylib
 *.dll
-!raylib.dll
 *.pdb
 *.ilk
 *.exp

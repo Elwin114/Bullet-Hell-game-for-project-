@@ -4,4 +4,5 @@ Simple bullet hell game made by using C++ language and raylib library for univer
 ## Building game
 There is a makefile which you can use to build project. All you need to do is type *make* into terminal in directory in which game is located
 ## !!Warning
-Make sure you have raylib.dll file, otherwise game won't launch
+Make sure you have raylib.dll file in the same directory as game, otherwise game won't launch
+Here you can download raylib: https://github.com/raysan5/raylib/releases
