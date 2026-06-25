@@ -1,63 +1,62 @@
 #include "Player.h"
+
 #include <cmath>
 
 Player::Player() {
-    pos = {400, 300};
-    radius = 15;
-    speed = 3;
-    health = 5;
-    shootCooldown = 0;
-    shootDelay = 0.15f;
-    texture = {0};
+  pos = {400, 300};
+  radius = 15;
+  speed = 3;
+  health = 5;
+  shootCooldown = 0;
+  shootDelay = 0.15f;
+  texture = {0};
 }
 
-void Player::SetTexture(Texture2D tex) {
-    texture = tex;
-}
+void Player::SetTexture(Texture2D tex) { texture = tex; }
 
 void Player::Update(std::vector<Bullet>& bullets) {
-    // Управление
-    Vector2 move = {0, 0};
-    if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP))    move.y -= 1;
-    if (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN))  move.y += 1;
-    if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT))  move.x -= 1;
-    if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) move.x += 1;
+  // Управление
+  Vector2 move = {0, 0};
+  if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP)) move.y -= 1;
+  if (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN)) move.y += 1;
+  if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)) move.x -= 1;
+  if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) move.x += 1;
 
-    if (move.x != 0 || move.y != 0) {
-        float len = sqrtf(move.x*move.x + move.y*move.y);
-        move.x /= len;
-        move.y /= len;
-        pos.x += move.x * speed;
-        pos.y += move.y * speed;
-    }
+  if (move.x != 0 || move.y != 0) {
+    float len = sqrtf(move.x * move.x + move.y * move.y);
+    move.x /= len;
+    move.y /= len;
+    pos.x += move.x * speed;
+    pos.y += move.y * speed;
+  }
 
-    // Ограничение в пределах экрана
-    if (pos.x < radius) pos.x = radius;
-    if (pos.x > GetScreenWidth() - radius) pos.x = GetScreenWidth() - radius;
-    if (pos.y < radius) pos.y = radius;
-    if (pos.y > GetScreenHeight() - radius) pos.y = GetScreenHeight() - radius;
+  // Ограничение в пределах экрана
+  if (pos.x < radius) pos.x = radius;
+  if (pos.x > GetScreenWidth() - radius) pos.x = GetScreenWidth() - radius;
+  if (pos.y < radius) pos.y = radius;
+  if (pos.y > GetScreenHeight() - radius) pos.y = GetScreenHeight() - radius;
 
-    // Стрельба (пробел)
-    shootCooldown -= GetFrameTime();
-    if (IsKeyDown(KEY_SPACE) && shootCooldown <= 0) {
-        shootCooldown = shootDelay;
-        // Создаём пулю игрока (вверх)
-        Bullet b(pos, {0, -8}, 4, false);
-        bullets.push_back(b);
-    }
+  // Стрельба (пробел)
+  shootCooldown -= GetFrameTime();
+  if (IsKeyDown(KEY_SPACE) && shootCooldown <= 0) {
+    shootCooldown = shootDelay;
+    // Создаём пулю игрока (вверх)
+    Bullet b(pos, {0, -8}, 4, false);
+    bullets.push_back(b);
+  }
 }
 
 void Player::Draw() const {
-    if (texture.id > 0) {
-        // Рисуем текстуру по центру позиции
-        Vector2 origin = {texture.width/2.0f, texture.height/2.0f};
+  if (texture.id > 0) {
+    // Рисуем текстуру по центру позиции
+    Vector2 origin = {texture.width / 2.0f, texture.height / 2.0f};
 
-        Vector2 drawPos = {pos.x - origin.x, pos.y - origin.y};
+    Vector2 drawPos = {pos.x - origin.x, pos.y - origin.y};
 
-        DrawTextureV(texture, drawPos, WHITE);
-    } else {
-        // Запасной вариант – круг (если текстура не загружена)
-        DrawCircleV(pos, radius, BLUE);
-        DrawCircleLines(pos.x, pos.y, radius, LIGHTGRAY);
-    }
+    DrawTextureV(texture, drawPos, WHITE);
+  } else {
+    // Запасной вариант – круг (если текстура не загружена)
+    DrawCircleV(pos, radius, BLUE);
+    DrawCircleLines(pos.x, pos.y, radius, LIGHTGRAY);
+  }
 }

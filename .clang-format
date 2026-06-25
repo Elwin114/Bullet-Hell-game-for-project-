@@ -1,14 +1,1 @@
 BasedOnStyle: Google
-
-UseTab: Never
-
-
-BreakBeforeBraces: Attach
-
-AlignAfterOpenBracket: Align
-AlignConsecutiveAssignments: true
-AlignConsecutiveDeclarations: true
-
-
-
-ColumnnLimit: 100
