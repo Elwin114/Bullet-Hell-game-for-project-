@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <cmath>
 
-Game::Game(Texture2D pTex): enemySpawnTimer(0), enemySpawnInterval(3.0f), playerTex(pTex) {
+Game::Game(Texture2D pTex): enemySpawnTimer(0), enemySpawnInterval(3.0f),, patternSpawnTimer(0), patternSpawnInterval(1.0f), playerTex(pTex) {
     player.SetTexture(playerTex);
 }
 
@@ -12,16 +12,30 @@ void Game::Update() {
     // Обновить все пули
     for (auto& b : bullets) b.Update();
 
-    // Удалить неактивные пули (эффективный способ)
+    // Удалить неактивные пули
     bullets.erase(std::remove_if(bullets.begin(), bullets.end(),
         [](const Bullet& b) { return !b.active; }), bullets.end());
-
+    patternSpawnTimer -= GetFrameTime();
+    if (patternSpawnTimer <= 0) {
+        patternSpawnTimer = patternSpawnInterval;
+        float x = GetRandomValue(50, GetScreenWidth()-50);
+        Vector2 pos = {x, -20};
+        int pattern = GetRandomValue(0, 2); // 0-цветок, 1-линия, 2-случайный
+        switch (pattern) {
+            case 0: Enemy::SpawnFlower(pos, bullets); break;
+            case 1: Enemy::SpawnLine(pos, bullets); break;
+            case 2: Enemy::SpawnRandom(pos, bullets); break;
+        }
+    }
     // Спавн врагов
     enemySpawnTimer -= GetFrameTime();
     if (enemySpawnTimer <= 0) {
         enemySpawnTimer = enemySpawnInterval;
         float x = GetRandomValue(50, GetScreenWidth()-50);
-        enemies.emplace_back(Vector2{x, -30});
+        // Выбираем тип врага случайно
+        int rnd = GetRandomValue(0, 99);
+        EnemyType type = (rnd < 70) ? VORTEX_ENEMY : ASTEROID_ENEMY;
+        enemies.emplace_back(Vector2{x, -30}, type);   // <-- теперь передаём тип
     }
 
     // Обновить врагов
@@ -33,6 +47,7 @@ void Game::Update() {
     // Удалить неактивных врагов
     enemies.erase(std::remove_if(enemies.begin(), enemies.end(),
         [](const Enemy& e) { return !e.active; }), enemies.end());
+
 }
 
 void Game::Draw() {
@@ -54,7 +69,10 @@ void Game::CheckCollisions() {
             float dy = b.pos.y - e.pos.y;
             if (dx*dx + dy*dy < (b.radius + e.radius)*(b.radius + e.radius)) {
                 b.active = false;
-                e.active = false;
+                e.TakeDamage(b.damage);
+                if (!e.active) {
+                    e.OnDeath(bullets);
+                }
             }
         }
     }
@@ -66,11 +84,11 @@ void Game::CheckCollisions() {
         float dy = b.pos.y - player.pos.y;
         if (dx*dx + dy*dy < (b.radius + player.radius)*(b.radius + player.radius)) {
             b.active = false;
-            player.health--;
+            player.health -= b.damage;
         }
     }
 
-    // Враги vs игрок (столкновение)
+    // Враги vs игрок
     for (auto& e : enemies) {
         if (!e.active) continue;
         float dx = e.pos.x - player.pos.x;

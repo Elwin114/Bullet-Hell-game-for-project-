@@ -13,6 +13,10 @@ public:
     std::vector<Enemy> enemies;
     float enemySpawnTimer;
     float enemySpawnInterval;
+    float asteroidSpawnTimer;
+    float asteroidSpawnInterval;
+    float patternSpawnTimer;
+    float patternSpawnInterval;
     Texture2D playerTex;
 
     Game(Texture2D pTex);
